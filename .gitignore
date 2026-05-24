@@ -38,11 +38,17 @@
 *.exe
 *.out
 *.app
+*.elf
+*.hex
+*.fuses
+*.lss
+*.map
 
 # Build directories
 build/
 Build/
 build-*/
+out/
 
 # CMake generated files
 CMakeFiles/
