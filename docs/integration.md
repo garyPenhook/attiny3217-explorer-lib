@@ -5,7 +5,7 @@
 Use the library with `add_subdirectory()` from a new CMake firmware project:
 
 ```cmake
-add_subdirectory(/home/gary/Downloads/attiny3217-explorer-lib attiny3217_explorer_lib)
+add_subdirectory(path/to/attiny3217-explorer-lib attiny3217_explorer_lib)
 
 add_executable(my_firmware
     main.cpp
@@ -24,6 +24,15 @@ cmake -S . -B build \
   -DATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include \
   -DATTINY3217_EXPLORER_F_CPU=20000000UL
 ```
+
+`ATTINY3217_EXPLORER_DFP_INCLUDE` has no repository-specific default. It can also be supplied through an environment variable with the same name:
+
+```sh
+export ATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include
+cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=/path/to/avr-gcc-toolchain.cmake
+```
+
+Leave it unset only when your AVR toolchain already finds the Microchip ATtiny DFP headers.
 
 ## Startup Choices
 

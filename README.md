@@ -22,16 +22,19 @@ Start with `docs/api-reference.md` for the complete public header API, then use 
 - Board: ATtiny3217 Curiosity Nano mounted on Curiosity Nano Explorer
 - CPU clock: internal 20 MHz oscillator, no prescaler
 - Build mode: `avr-g++`, `-std=gnu++23`, exceptions and RTTI disabled
-- DFP include path default: `/home/gary/.mchp_packs/Microchip/ATtiny_DFP/3.4.278/include`
+- DFP headers: supplied by the toolchain, by `ATTINY3217_EXPLORER_DFP_INCLUDE`, or by the environment variable of the same name
 
 ## Quick Build
 
 ```sh
 cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/home/gary/Projects/avr_C++/cmake/avr-gcc-toolchain.cmake \
+  -DCMAKE_TOOLCHAIN_FILE=/path/to/avr-gcc-toolchain.cmake \
+  -DATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include \
   -DATTINY3217_EXPLORER_BUILD_EXAMPLES=ON
 cmake --build build
 ```
+
+Omit `ATTINY3217_EXPLORER_DFP_INCLUDE` only when your AVR toolchain already finds the Microchip ATtiny DFP headers needed by `<avr/io.h>`.
 
 The reusable library archive is emitted as `build/out/lib/libattiny3217_explorer.a`.
 The example output appears in `build/out/telemetry_demo/`.
@@ -41,7 +44,7 @@ The example output appears in `build/out/telemetry_demo/`.
 Add this directory as a subdirectory, then link `attiny3217_explorer`.
 
 ```cmake
-add_subdirectory(/home/gary/Downloads/attiny3217-explorer-lib attiny3217_explorer_lib)
+add_subdirectory(path/to/attiny3217-explorer-lib attiny3217_explorer_lib)
 
 add_executable(my_firmware main.cpp)
 target_link_libraries(my_firmware PRIVATE attiny3217_explorer)

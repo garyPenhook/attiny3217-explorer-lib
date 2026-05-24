@@ -4,9 +4,19 @@ project(attiny3217_explorer_lib LANGUAGES CXX)
 
 set(ATTINY3217_EXPLORER_MCU attiny3217 CACHE STRING "Target AVR MCU")
 set(ATTINY3217_EXPLORER_F_CPU 20000000UL CACHE STRING "CPU clock used by firmware")
+
+set(_ATTINY3217_EXPLORER_DFP_INCLUDE_DEFAULT "")
+if(DEFINED ENV{ATTINY3217_EXPLORER_DFP_INCLUDE})
+    set(_ATTINY3217_EXPLORER_DFP_INCLUDE_DEFAULT "$ENV{ATTINY3217_EXPLORER_DFP_INCLUDE}")
+endif()
 set(ATTINY3217_EXPLORER_DFP_INCLUDE
-    "/home/gary/.mchp_packs/Microchip/ATtiny_DFP/3.4.278/include"
-    CACHE PATH "Microchip ATtiny DFP include directory")
+    "${_ATTINY3217_EXPLORER_DFP_INCLUDE_DEFAULT}"
+    CACHE PATH "Optional Microchip ATtiny DFP include directory")
+if(ATTINY3217_EXPLORER_DFP_INCLUDE AND NOT IS_DIRECTORY "${ATTINY3217_EXPLORER_DFP_INCLUDE}")
+    message(FATAL_ERROR
+        "ATTINY3217_EXPLORER_DFP_INCLUDE does not exist: "
+        "${ATTINY3217_EXPLORER_DFP_INCLUDE}")
+endif()
 
 option(ATTINY3217_EXPLORER_BUILD_EXAMPLES "Build bundled example firmware" OFF)
 
@@ -60,6 +70,18 @@ function(attiny3217_explorer_apply_avr_options target)
     endif()
 endfunction()
 
+function(attiny3217_explorer_apply_public_includes target)
+    target_include_directories(${target} PUBLIC
+        ${CMAKE_CURRENT_LIST_DIR}/include
+    )
+
+    if(ATTINY3217_EXPLORER_DFP_INCLUDE)
+        target_include_directories(${target} PUBLIC
+            ${ATTINY3217_EXPLORER_DFP_INCLUDE}
+        )
+    endif()
+endfunction()
+
 add_library(attiny3217_explorer STATIC
     src/analog_sensor.cpp
     src/blink_task.cpp
@@ -70,10 +92,7 @@ add_library(attiny3217_explorer STATIC
     src/uart0_rx.cpp
 )
 
-target_include_directories(attiny3217_explorer PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/include
-    ${ATTINY3217_EXPLORER_DFP_INCLUDE}
-)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer)
 
 set_target_properties(attiny3217_explorer PROPERTIES
     OUTPUT_NAME "attiny3217_explorer"
@@ -85,10 +104,7 @@ attiny3217_explorer_apply_avr_options(attiny3217_explorer)
 # Link this object into firmware targets that should carry the library's
 # source-controlled ATtiny3217 fuse bytes in the ELF .fuse section.
 add_library(attiny3217_explorer_fuses OBJECT src/fuses.cpp)
-target_include_directories(attiny3217_explorer_fuses PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/include
-    ${ATTINY3217_EXPLORER_DFP_INCLUDE}
-)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer_fuses)
 attiny3217_explorer_apply_avr_options(attiny3217_explorer_fuses)
 
 if(ATTINY3217_EXPLORER_BUILD_EXAMPLES)
