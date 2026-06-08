@@ -214,15 +214,18 @@ Full known-good Explorer board bring-up.
 
 Use this when a project links `attiny3217_explorer_platform_init` and wants the same startup sequence as the telemetry demo. For smaller firmware, initialize only the required modules.
 
-## `app.hpp`
+## `app.hpp` (example-only, not part of the public API)
 
-Application-level foreground-loop hook used by the bundled telemetry example.
+`app.hpp` is **not** a public library header. It lives in
+`examples/telemetry_demo/app.hpp` as glue so the example's `main.cpp` can call an
+application loop supplied alongside it. It is documented here only so readers of
+the example can follow `main.cpp`.
 
 | Symbol | Meaning |
 | --- | --- |
-| `app::run()` | Non-returning foreground loop entry point. The example implementation samples sensors, services button/UART events, updates the OLED, emits telemetry, and waits for the TCA0 frame tick. |
+| `app::run()` | Non-returning foreground loop entry point used by the telemetry example: samples sensors, services button/UART events, updates the OLED, emits telemetry, and waits for the TCA0 frame tick. |
 
-`include/app.hpp` is example glue so the example's `main.cpp` can call an application implementation supplied by the firmware. The reusable `attiny3217_explorer` static library does not include `examples/telemetry_demo/app.cpp`; new firmware can provide its own `app::run()` or ignore this header.
+New firmware defines its own `main()`/loop and does not depend on this header.
 
 ## `fuses.hpp`
 
