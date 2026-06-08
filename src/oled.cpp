@@ -191,7 +191,7 @@ bool init()
 
 bool clear()
 {
-    uint8_t zeros[width] = {};
+    const uint8_t zeros[width] = {};
 
     for (uint8_t page = 0u; page < page_count; ++page) {
         if (!set_window(0u, static_cast<uint8_t>(width - 1u), page, page)
