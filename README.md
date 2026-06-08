@@ -26,13 +26,26 @@ Start with `docs/api-reference.md` for the complete public header API, then use 
 
 ## Quick Build
 
+The repository ships an AVR toolchain file and CMake presets, so a build picks up
+`avr-g++` automatically (it does not fall back to the host compiler):
+
+```sh
+cmake --preset avr-examples
+cmake --build build
+```
+
+This is equivalent to invoking CMake directly with the bundled toolchain file:
+
 ```sh
 cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/path/to/avr-gcc-toolchain.cmake \
+  --toolchain cmake/avr-gcc-toolchain.cmake \
   -DATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include \
   -DATTINY3217_EXPLORER_BUILD_EXAMPLES=ON
 cmake --build build
 ```
+
+If the AVR tools are not on `PATH`, point the toolchain at them with
+`-DAVR_TOOLCHAIN_DIR=/path/to/avr-gcc/bin` (or override `-DAVR_TOOLCHAIN_PREFIX=`).
 
 Omit `ATTINY3217_EXPLORER_DFP_INCLUDE` only when your AVR toolchain already finds the Microchip ATtiny DFP headers needed by `<avr/io.h>`.
 

@@ -26,16 +26,20 @@ Override paths or clock values at configure time when needed:
 
 ```sh
 cmake -S . -B build \
-  -DCMAKE_TOOLCHAIN_FILE=/path/to/avr-gcc-toolchain.cmake \
+  --toolchain cmake/avr-gcc-toolchain.cmake \
   -DATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include \
   -DATTINY3217_EXPLORER_F_CPU=20000000UL
 ```
+
+The bundled `cmake/avr-gcc-toolchain.cmake` (also wired through the `avr` and
+`avr-examples` presets in `CMakePresets.json`) selects `avr-gcc`/`avr-g++`. Use
+`-DAVR_TOOLCHAIN_DIR=` if the tools are not on `PATH`.
 
 `ATTINY3217_EXPLORER_DFP_INCLUDE` has no repository-specific default. It can also be supplied through an environment variable with the same name:
 
 ```sh
 export ATTINY3217_EXPLORER_DFP_INCLUDE=/path/to/ATtiny_DFP/include
-cmake -S . -B build -DCMAKE_TOOLCHAIN_FILE=/path/to/avr-gcc-toolchain.cmake
+cmake -S . -B build --toolchain cmake/avr-gcc-toolchain.cmake
 ```
 
 Leave it unset only when your AVR toolchain already finds the Microchip ATtiny DFP headers.

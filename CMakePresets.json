@@ -1,0 +1,41 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "avr",
+      "displayName": "ATtiny3217 (avr-gcc)",
+      "description": "Cross build for ATtiny3217 using the bundled avr-gcc toolchain file",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "toolchainFile": "${sourceDir}/cmake/avr-gcc-toolchain.cmake",
+      "cacheVariables": {
+        "ATTINY3217_EXPLORER_MCU": "attiny3217",
+        "ATTINY3217_EXPLORER_F_CPU": "20000000UL"
+      }
+    },
+    {
+      "name": "avr-examples",
+      "displayName": "ATtiny3217 + examples",
+      "description": "Same as 'avr' but also builds the bundled telemetry example",
+      "inherits": "avr",
+      "cacheVariables": {
+        "ATTINY3217_EXPLORER_BUILD_EXAMPLES": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "avr",
+      "configurePreset": "avr"
+    },
+    {
+      "name": "avr-examples",
+      "configurePreset": "avr-examples"
+    }
+  ]
+}
