@@ -4,13 +4,8 @@
 #include <util/atomic.h>
 
 #include "board.hpp"
-#include "timer0.hpp"
 
 namespace {
-
-// Number of TCA0 application ticks to ignore after an accepted press. With the
-// current 10 Hz timer setup this is approximately 200 ms.
-constexpr uint16_t debounce_ticks = 2u;
 
 // Set by PORTB_PORT_vect and consumed by foreground code..
 volatile bool g_button_pressed = false;
@@ -33,13 +28,6 @@ bool take_latched_press()
 
     return was_pressed;
 }
-
-bool debounce_window_expired(uint16_t now)
-{
-    // Unsigned subtraction keeps working across uint16_t wraparound.
-    return static_cast<uint16_t>(now - g_last_press_tick) >= debounce_ticks;
-}
-
 }  // namespace 
 
 namespace button_irq {
@@ -77,6 +65,12 @@ void clear_pressed()
 
 bool consume_press()
 {
+    // Raw event path for applications that own their own debounce strategy.
+    return take_latched_press();
+}
+
+bool consume_press_debounced(uint16_t now_ticks, uint16_t debounce_ticks)
+{
     // Fast path avoids disabling interrupts when no event is pending.
     if (!pressed()) {
         return false;
@@ -86,13 +80,14 @@ bool consume_press()
         return false;
     }
 
-    const uint16_t now = timer0::tick_count();
-    if (g_press_debounce_active && !debounce_window_expired(now)) {
+    if (debounce_ticks != 0u
+        && g_press_debounce_active
+        && static_cast<uint16_t>(now_ticks - g_last_press_tick) < debounce_ticks) {
         return false;
     }
 
     g_press_debounce_active = true;
-    g_last_press_tick = now;
+    g_last_press_tick = now_ticks;
     return true;
 }
 

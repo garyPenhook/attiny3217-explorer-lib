@@ -20,17 +20,19 @@ void run()
     // Match the runtime clock to board::cpu_hz/F_CPU.
     clock::use_internal_20mhz_no_prescaler();
 
+    // Configure board-owned pins before their peripherals start driving them.
+    board::StatusLed::configure_output();
+    board::StatusLed::set_low();
+    board::Usart0Tx::configure_output();
+    board::Usart0Rx::configure_input();
+    board::Twi0Scl::configure_input();
+    board::Twi0Sda::configure_input();
+    board::Spi0Mosi::configure_output();
+    board::Spi0Sck::configure_output();
+    board::Spi0Miso::configure_input();
+
     // Prepare the button interrupt before global interrupts are enabled.
     button_irq::init();
-
-    // PB5=LED, PB2=USART0 TX as outputs.
-    PORTB.DIRSET = static_cast<uint8_t>((1u << 5) | (1u << 2));
-    PORTB.OUTCLR = static_cast<uint8_t>(1u << 5);
-    // PB3=USART0 RX, PB1/PB0=TWI inputs.
-    PORTB.DIRCLR = static_cast<uint8_t>((1u << 3) | (1u << 1) | (1u << 0));
-    // PA4=SPI MOSI, PA3=SPI SCK outputs; PA5=SPI MISO input.
-    PORTA.DIRSET = static_cast<uint8_t>((1u << 4) | (1u << 3));
-    PORTA.DIRCLR = static_cast<uint8_t>(1u << 5);
 
     // Bring up serial receive/transmit first so startup text and later telemetry
     // have a configured UART.
@@ -49,12 +51,7 @@ void run()
     analog_sensor::init();
 
     // Emit a compact boot marker on USART0.
-    uart0::write_byte('b');
-    uart0::write_byte('o');
-    uart0::write_byte('o');
-    uart0::write_byte('t');
-    uart0::write_byte('\r');
-    uart0::write_byte('\n');
+    uart0::write_cstr("boot\r\n");
 
     // Enable ISRs only after all interrupt sources have been configured and
     // stale flags have been cleared.

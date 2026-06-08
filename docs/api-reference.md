@@ -175,7 +175,8 @@ Active-low button interrupt service for `board::ButtonIn`.
 | `button_irq::init()` | Configures `PB4` input, pull-up, falling-edge interrupt, and clears state. |
 | `button_irq::pressed()` | Returns the current latched press state. |
 | `button_irq::clear_pressed()` | Clears the latched press state atomically. |
-| `button_irq::consume_press()` | Returns true once per debounced button press. |
+| `button_irq::consume_press()` | Returns true once per latched press with no debounce policy. |
+| `button_irq::consume_press_debounced(now_ticks, debounce_ticks)` | Returns true once per debounced press using a caller-owned tick source. |
 
 ISR ownership: defines `PORTB_PORT_vect`.
 
@@ -201,8 +202,6 @@ SSD1306 OLED helper for the Explorer 128x64 display.
 | `oled::init()` | Sends SSD1306 init commands and clears the display. |
 | `oled::clear()` | Clears all display RAM pages. |
 | `oled::write_text_page(page, text)` | Writes text to one 8-pixel page. |
-| `oled::write_status(millivolts, twi_ok)` | Writes the demo status line on page 0. |
-
 Text rendering supports a compact uppercase/numeric 5x7 glyph set.
 
 ## `platform_init.hpp`
@@ -213,7 +212,7 @@ Full known-good Explorer board bring-up.
 | --- | --- |
 | `platform_init::run()` | Configures clock, GPIO direction, button IRQ, USART0, USART0 RX ISR, SPI0, TWI0, OLED, TCA0 tick, ADC0, boot UART text, and then enables global interrupts. |
 
-Use this when a project wants the same startup sequence as the telemetry demo. For smaller firmware, initialize only the required modules.
+Use this when a project links `attiny3217_explorer_platform_init` and wants the same startup sequence as the telemetry demo. For smaller firmware, initialize only the required modules.
 
 ## `app.hpp`
 
@@ -223,7 +222,7 @@ Application-level foreground-loop hook used by the bundled telemetry example.
 | --- | --- |
 | `app::run()` | Non-returning foreground loop entry point. The example implementation samples sensors, services button/UART events, updates the OLED, emits telemetry, and waits for the TCA0 frame tick. |
 
-`include/app.hpp` is public so the example's `main.cpp` can call an application implementation supplied by the firmware. The reusable `attiny3217_explorer` static library does not include `examples/telemetry_demo/app.cpp`; new firmware can provide its own `app::run()` or ignore this header.
+`include/app.hpp` is example glue so the example's `main.cpp` can call an application implementation supplied by the firmware. The reusable `attiny3217_explorer` static library does not include `examples/telemetry_demo/app.cpp`; new firmware can provide its own `app::run()` or ignore this header.
 
 ## `fuses.hpp`
 

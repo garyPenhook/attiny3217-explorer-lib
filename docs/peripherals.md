@@ -24,7 +24,7 @@ The telemetry demo uses `PER=31249` and `DIV64` for 10 Hz at 20 MHz.
 
 ## Button
 
-`button_irq::init()` configures `PB4` as an input with pull-up and falling-edge pin interrupt. Foreground code should call `button_irq::consume_press()` instead of doing work in the ISR.
+`button_irq::init()` configures `PB4` as an input with pull-up and falling-edge pin interrupt. Foreground code should call `button_irq::consume_press()` for raw edge consumption or `button_irq::consume_press_debounced()` when the application owns the debounce timebase.
 
 Interrupt vector used: `PORTB_PORT_vect`.
 
@@ -44,4 +44,4 @@ The Explorer SSD1306 OLED address is `0x3d`. The telemetry demo also probes the 
 
 ## OLED
 
-`oled::init()` sends the SSD1306 setup sequence for the Explorer 128x64 panel and clears display RAM. Text rendering is intentionally small: 5x7 uppercase glyphs, one 8-pixel page at a time.
+`oled::init()` sends the SSD1306 setup sequence for the Explorer 128x64 panel and clears display RAM. Text rendering is intentionally small: 5x7 uppercase glyphs, one 8-pixel page at a time. Demo-specific status-line formatting belongs in the example/application layer.

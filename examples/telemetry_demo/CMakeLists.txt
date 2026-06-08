@@ -4,7 +4,13 @@ add_executable(telemetry_demo
     $<TARGET_OBJECTS:attiny3217_explorer_fuses>
 )
 
-target_link_libraries(telemetry_demo PRIVATE attiny3217_explorer)
+target_link_libraries(telemetry_demo PRIVATE
+    attiny3217_explorer
+    attiny3217_explorer_button_irq
+    attiny3217_explorer_platform_init
+    attiny3217_explorer_timer0
+    attiny3217_explorer_uart0_rx
+)
 attiny3217_explorer_apply_avr_options(telemetry_demo)
 
 find_program(AVR_OBJCOPY avr-objcopy REQUIRED)

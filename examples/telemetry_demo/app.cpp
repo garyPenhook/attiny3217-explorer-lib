@@ -44,6 +44,51 @@ struct Telemetry {
     bool twi_ok;
 };
 
+char* append_text(char* out, const char* text)
+{
+    while (*text != '\0') {
+        *out++ = *text++;
+    }
+
+    return out;
+}
+
+char* append_decimal_u16(char* out, uint16_t value)
+{
+    constexpr uint16_t divisors[] = {10000u, 1000u, 100u, 10u, 1u};
+    bool started = false;
+
+    for (uint8_t i = 0u; i < static_cast<uint8_t>(sizeof(divisors) / sizeof(divisors[0])); ++i) {
+        const uint16_t divisor = divisors[i];
+        const uint8_t digit = static_cast<uint8_t>(value / divisor);
+        if (digit != 0u || started) {
+            *out++ = static_cast<char>('0' + digit);
+            started = true;
+        }
+        value = static_cast<uint16_t>(value % divisor);
+    }
+
+    if (!started) {
+        *out++ = '0';
+    }
+
+    return out;
+}
+
+void write_status_display(const Telemetry& telemetry)
+{
+    char text[22] = {};
+    char* out = text;
+
+    out = append_text(out, "ADC ");
+    out = append_decimal_u16(out, telemetry.sample_mv);
+    out = append_text(out, "MV ");
+    out = append_text(out, telemetry.twi_ok ? "TWI OK" : "TWI ERR");
+    *out = '\0';
+
+    oled::write_text_page(0u, text);
+}
+
 inline void write_checked_char(char value, uint8_t& checksum)
 {
     // The checksum covers every emitted character before the checksum field.
@@ -103,7 +148,7 @@ inline void write_hex8(uint8_t value)
     blink_task::tick();
 
     // Button press work stays in foreground; the ISR only latches the event.
-    if (button_irq::consume_press()) {
+    if (button_irq::consume_press_debounced(timer0::tick_count())) {
         uart0::write_cstr(button_text);
     }
 
@@ -156,7 +201,7 @@ namespace app {
             // status frame, then waits for the periodic TCA0 tick.
             const Telemetry telemetry = sample_and_transfer();
             service_events();
-            oled::write_status(telemetry.sample_mv, telemetry.twi_ok);
+            write_status_display(telemetry);
             send_status_frame(telemetry);
             timer0::wait_tick();
         }

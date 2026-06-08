@@ -12,7 +12,13 @@ add_executable(my_firmware
     $<TARGET_OBJECTS:attiny3217_explorer_fuses>
 )
 
-target_link_libraries(my_firmware PRIVATE attiny3217_explorer)
+target_link_libraries(my_firmware PRIVATE
+    attiny3217_explorer
+    attiny3217_explorer_button_irq
+    attiny3217_explorer_platform_init
+    attiny3217_explorer_timer0
+    attiny3217_explorer_uart0_rx
+)
 attiny3217_explorer_apply_avr_options(my_firmware)
 ```
 
@@ -52,7 +58,7 @@ For smaller firmware, initialize only the pieces you need.
 
 ## ISR Ownership
 
-These modules define interrupt vectors:
+These optional modules define interrupt vectors:
 
 | Module | Vector |
 | --- | --- |
@@ -60,11 +66,11 @@ These modules define interrupt vectors:
 | `button_irq.cpp` | `PORTB_PORT_vect` |
 | `uart0_rx.cpp` | `USART0_RXC_vect` |
 
-If a new project needs one of those vectors for different behavior, remove that source from the library target or replace the module consistently.
+If a new project needs one of those vectors for different behavior, do not link the corresponding optional target or replace the module consistently.
 
 ## Target Shape
 
-`attiny3217_explorer` is a static library. A normal build emits:
+`attiny3217_explorer` is the base static library. Optional AVR-specific components are shipped as separate static libraries so projects can opt into ISR ownership and the board bring-up sequence explicitly. A normal build emits:
 
 ```text
 build/out/lib/libattiny3217_explorer.a

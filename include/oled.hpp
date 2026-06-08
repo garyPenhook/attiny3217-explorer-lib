@@ -22,7 +22,4 @@ bool clear();
 // Write a NUL-terminated text string to one 8-pixel-high display page.
 bool write_text_page(uint8_t page, const char* text);
 
-// Render the foreground telemetry summary on page 0.
-bool write_status(uint16_t millivolts, bool twi_ok);
-
 }  // namespace oled

@@ -2,14 +2,14 @@
 
 Reusable C++23 board support for the ATtiny3217 Curiosity Nano on the Curiosity Nano Explorer board.
 
-The library packages the board mappings and peripheral helpers from the working `avr_C++` project so later firmware can start from the same known-good pinout, clock, UART, SPI, TWI, ADC, timer, button interrupt, SSD1306 OLED, and fuse policy.
+The library packages the board mappings and peripheral helpers from the working `avr_C++` project so later firmware can start from the same known-good pinout, clock, UART, SPI, TWI, ADC, SSD1306 OLED, and fuse policy.
 
 ## Contents
 
 | Path | Purpose |
 | --- | --- |
 | `include/` | Public headers for board aliases, GPIO, clock, ADC, USART0, SPI0, TWI0, timer, OLED, button, and formatting helpers. |
-| `src/` | Non-header implementations and ISR-backed modules. |
+| `src/` | Non-header implementations and optional ISR-backed modules. |
 | `examples/telemetry_demo/` | The current telemetry application as a buildable example. |
 | `docs/` | Board map, peripheral notes, and integration guide. |
 | `scripts/` | Artifact and memory-report helper scripts copied from the source project. |
@@ -38,6 +38,7 @@ Omit `ATTINY3217_EXPLORER_DFP_INCLUDE` only when your AVR toolchain already find
 
 The reusable library archive is emitted as `build/out/lib/libattiny3217_explorer.a`.
 The example output appears in `build/out/telemetry_demo/`.
+Optional component archives are emitted in the same `build/out/lib/` directory.
 
 ## Use In A New Project
 
@@ -47,7 +48,11 @@ Add this directory as a subdirectory, then link `attiny3217_explorer`.
 add_subdirectory(path/to/attiny3217-explorer-lib attiny3217_explorer_lib)
 
 add_executable(my_firmware main.cpp)
-target_link_libraries(my_firmware PRIVATE attiny3217_explorer)
+target_link_libraries(my_firmware PRIVATE
+  attiny3217_explorer
+  attiny3217_explorer_platform_init
+  attiny3217_explorer_timer0
+)
 target_sources(my_firmware PRIVATE $<TARGET_OBJECTS:attiny3217_explorer_fuses>)
 attiny3217_explorer_apply_avr_options(my_firmware)
 ```
@@ -79,8 +84,10 @@ int main()
 }
 ```
 
+Link `attiny3217_explorer_timer0` when using the timer ISR-backed helper shown above.
+
 ## Notes
 
 - The reusable library does not include `examples/telemetry_demo/app.cpp` in the library target. Future projects should provide their own foreground loop.
-- `platform_init::run()` is included for projects that want the full known-good Explorer bring-up.
-- `button_irq`, `timer0`, and `uart0_rx` install ISRs. Avoid defining the same interrupt vectors elsewhere unless you replace these modules.
+- `platform_init::run()` is shipped as a separate `attiny3217_explorer_platform_init` target so projects opt into the full known-good Explorer bring-up explicitly.
+- `button_irq`, `timer0`, and `uart0_rx` are separate ISR-owning targets. Link them only when you want those vectors owned by this library.

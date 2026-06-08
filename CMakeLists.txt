@@ -85,11 +85,7 @@ endfunction()
 add_library(attiny3217_explorer STATIC
     src/analog_sensor.cpp
     src/blink_task.cpp
-    src/button_irq.cpp
     src/oled.cpp
-    src/platform_init.cpp
-    src/timer0.cpp
-    src/uart0_rx.cpp
 )
 
 attiny3217_explorer_apply_public_includes(attiny3217_explorer)
@@ -100,6 +96,45 @@ set_target_properties(attiny3217_explorer PROPERTIES
 )
 
 attiny3217_explorer_apply_avr_options(attiny3217_explorer)
+
+add_library(attiny3217_explorer_timer0 STATIC src/timer0.cpp)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer_timer0)
+attiny3217_explorer_apply_avr_options(attiny3217_explorer_timer0)
+set_target_properties(attiny3217_explorer_timer0 PROPERTIES
+    OUTPUT_NAME "attiny3217_explorer_timer0"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib"
+)
+
+add_library(attiny3217_explorer_button_irq STATIC src/button_irq.cpp)
+target_link_libraries(attiny3217_explorer_button_irq PUBLIC attiny3217_explorer)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer_button_irq)
+attiny3217_explorer_apply_avr_options(attiny3217_explorer_button_irq)
+set_target_properties(attiny3217_explorer_button_irq PROPERTIES
+    OUTPUT_NAME "attiny3217_explorer_button_irq"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib"
+)
+
+add_library(attiny3217_explorer_uart0_rx STATIC src/uart0_rx.cpp)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer_uart0_rx)
+attiny3217_explorer_apply_avr_options(attiny3217_explorer_uart0_rx)
+set_target_properties(attiny3217_explorer_uart0_rx PROPERTIES
+    OUTPUT_NAME "attiny3217_explorer_uart0_rx"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib"
+)
+
+add_library(attiny3217_explorer_platform_init STATIC src/platform_init.cpp)
+target_link_libraries(attiny3217_explorer_platform_init PUBLIC
+    attiny3217_explorer
+    attiny3217_explorer_button_irq
+    attiny3217_explorer_timer0
+    attiny3217_explorer_uart0_rx
+)
+attiny3217_explorer_apply_public_includes(attiny3217_explorer_platform_init)
+attiny3217_explorer_apply_avr_options(attiny3217_explorer_platform_init)
+set_target_properties(attiny3217_explorer_platform_init PROPERTIES
+    OUTPUT_NAME "attiny3217_explorer_platform_init"
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out/lib"
+)
 
 # Link this object into firmware targets that should carry the library's
 # source-controlled ATtiny3217 fuse bytes in the ELF .fuse section.
