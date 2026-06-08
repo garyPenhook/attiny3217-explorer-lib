@@ -129,7 +129,7 @@ inline void write_hex8(uint8_t value)
     const uint8_t echo = spi0::transfer(spi_probe_byte);
 
     // Probe the Explorer I2C bus with an address-only write to the MCP9808.
-    const bool twi_ok = twi0::start_write(twi_target_address);
+    const bool twi_ok = twi0::start_write(twi_target_address) == twi0::Status::ok;
     twi0::stop();
 
     return Telemetry{

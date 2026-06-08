@@ -80,21 +80,19 @@ const uint8_t glyph_table[glyph_count][glyph_width] PROGMEM = {
 
 bool send_control(uint8_t control, const uint8_t* bytes, uint8_t size)
 {
-    if (!twi0::start_write(oled::address)) {
+    if (twi0::start_write(oled::address) != twi0::Status::ok) {
         twi0::stop();
         return false;
     }
 
-    if (!twi0::write_byte(control)) {
+    if (twi0::write_byte(control) != twi0::Status::ok) {
         twi0::stop();
         return false;
     }
 
-    for (uint8_t i = 0u; i < size; ++i) {
-        if (!twi0::write_byte(bytes[i])) {
-            twi0::stop();
-            return false;
-        }
+    if (twi0::write_bytes(bytes, size) != twi0::Status::ok) {
+        twi0::stop();
+        return false;
     }
 
     twi0::stop();
