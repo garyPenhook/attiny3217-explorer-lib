@@ -53,35 +53,13 @@ char* append_text(char* out, const char* text)
     return out;
 }
 
-char* append_decimal_u16(char* out, uint16_t value)
-{
-    constexpr uint16_t divisors[] = {10000u, 1000u, 100u, 10u, 1u};
-    bool started = false;
-
-    for (uint8_t i = 0u; i < static_cast<uint8_t>(sizeof(divisors) / sizeof(divisors[0])); ++i) {
-        const uint16_t divisor = divisors[i];
-        const uint8_t digit = static_cast<uint8_t>(value / divisor);
-        if (digit != 0u || started) {
-            *out++ = static_cast<char>('0' + digit);
-            started = true;
-        }
-        value = static_cast<uint16_t>(value % divisor);
-    }
-
-    if (!started) {
-        *out++ = '0';
-    }
-
-    return out;
-}
-
 void write_status_display(const Telemetry& telemetry)
 {
     char text[22] = {};
     char* out = text;
 
     out = append_text(out, "ADC ");
-    out = append_decimal_u16(out, telemetry.sample_mv);
+    out = fast_format::append_decimal_u16(out, telemetry.sample_mv);
     out = append_text(out, "MV ");
     out = append_text(out, telemetry.twi_ok ? "TWI OK" : "TWI ERR");
     *out = '\0';

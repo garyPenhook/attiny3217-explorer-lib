@@ -42,4 +42,28 @@ inline uint8_t xor_checksum(const uint8_t* first, const uint8_t* last)
     return checksum;
 }
 
+inline char* append_decimal_u16(char* out, uint16_t value)
+{
+    // Emit decimal digits without leading zeros (except a lone "0"). The output
+    // is at most five digits for a 16-bit value.
+    constexpr uint16_t divisors[] = {10000u, 1000u, 100u, 10u, 1u};
+    bool started = false;
+
+    for (uint8_t i = 0u; i < static_cast<uint8_t>(sizeof(divisors) / sizeof(divisors[0])); ++i) {
+        const uint16_t divisor = divisors[i];
+        const uint8_t digit = static_cast<uint8_t>(value / divisor);
+        if (digit != 0u || started) {
+            *out++ = static_cast<char>('0' + digit);
+            started = true;
+        }
+        value = static_cast<uint16_t>(value % divisor);
+    }
+
+    if (!started) {
+        *out++ = '0';
+    }
+
+    return out;
+}
+
 }  // namespace fast_format
