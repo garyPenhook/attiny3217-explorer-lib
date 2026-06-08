@@ -1,0 +1,15 @@
+@PACKAGE_INIT@
+
+# Exposes the attiny3217_explorer::* targets:
+#   attiny3217_explorer::hal               (header-only peripheral helpers)
+#   attiny3217_explorer::attiny3217_explorer (hal + board + drivers umbrella)
+#   attiny3217_explorer::board
+#   attiny3217_explorer::drivers
+#   attiny3217_explorer::timer0_irq
+#   attiny3217_explorer::uart0_rx_irq
+#   attiny3217_explorer::button_irq
+#   attiny3217_explorer::platform_init
+#   attiny3217_explorer::fuses
+include("${CMAKE_CURRENT_LIST_DIR}/attiny3217_explorerTargets.cmake")
+
+check_required_components(attiny3217_explorer)

@@ -49,28 +49,64 @@ If the AVR tools are not on `PATH`, point the toolchain at them with
 
 Omit `ATTINY3217_EXPLORER_DFP_INCLUDE` only when your AVR toolchain already finds the Microchip ATtiny DFP headers needed by `<avr/io.h>`.
 
-The reusable library archive is emitted as `build/out/lib/libattiny3217_explorer.a`.
+The component archives are emitted in `build/out/lib/`.
 The example output appears in `build/out/telemetry_demo/`.
-Optional component archives are emitted in the same `build/out/lib/` directory.
+
+## Targets
+
+The library is split into composable targets (namespaced aliases shown):
+
+| Target | Kind | Purpose |
+| --- | --- | --- |
+| `attiny3217_explorer::hal` | header-only | Raw ATtiny3217 peripheral helpers (gpio, clock, adc0, uart0, spi0, twi0). |
+| `attiny3217_explorer::board` | static | Curiosity Nano Explorer board devices (status LED, analog input). |
+| `attiny3217_explorer::drivers` | static | Reusable device drivers (SSD1306 OLED). |
+| `attiny3217_explorer::attiny3217_explorer` | umbrella | Convenience: `hal` + `board` + `drivers`. |
+| `attiny3217_explorer::timer0_irq` | static | TCA0 tick (owns `TCA0_OVF_vect`). |
+| `attiny3217_explorer::uart0_rx_irq` | static | USART0 RX ring buffer (owns `USART0_RXC_vect`). |
+| `attiny3217_explorer::button_irq` | static | Button edge interrupt (owns `PORTB_PORT_vect`). |
+| `attiny3217_explorer::platform_init` | static | Opinionated demo bring-up wiring the above together. |
+| `attiny3217_explorer::fuses` | object | Source-controlled fuse bytes for the ELF `.fuse` section. |
+
+The `*_irq` targets each claim a global interrupt vector, so they are separate
+archives you opt into explicitly.
 
 ## Use In A New Project
 
-Add this directory as a subdirectory, then link `attiny3217_explorer`.
+### As an installed package
+
+```sh
+cmake --preset avr-examples && cmake --build build
+cmake --install build --prefix /your/prefix
+```
+
+```cmake
+find_package(attiny3217_explorer CONFIG REQUIRED)
+
+add_executable(my_firmware main.cpp)
+target_link_libraries(my_firmware PRIVATE
+  attiny3217_explorer::attiny3217_explorer
+  attiny3217_explorer::platform_init
+  attiny3217_explorer::timer0_irq
+  attiny3217_explorer::fuses)   # optional: carries fuse bytes into the ELF
+```
+
+### As a subdirectory
 
 ```cmake
 add_subdirectory(path/to/attiny3217-explorer-lib attiny3217_explorer_lib)
 
 add_executable(my_firmware main.cpp)
 target_link_libraries(my_firmware PRIVATE
-  attiny3217_explorer
-  attiny3217_explorer_platform_init
-  attiny3217_explorer_timer0
-)
-target_sources(my_firmware PRIVATE $<TARGET_OBJECTS:attiny3217_explorer_fuses>)
+  attiny3217_explorer::attiny3217_explorer
+  attiny3217_explorer::platform_init
+  attiny3217_explorer::timer0_irq
+  attiny3217_explorer::fuses)
 attiny3217_explorer_apply_avr_options(my_firmware)
 ```
 
-`attiny3217_explorer` is a static-library target that builds `libattiny3217_explorer.a`. The fuse object is optional, but include it when you want the ELF to carry the source-controlled fuse bytes from `src/fuses.cpp`.
+Linking any target transitively provides the `hal` include path, the `F_CPU`
+definition, and the AVR `-mmcu` build/link flags.
 
 ## Minimal Firmware
 
