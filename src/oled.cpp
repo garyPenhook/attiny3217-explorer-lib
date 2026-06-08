@@ -106,10 +106,12 @@ bool send_commands(const uint8_t* commands, uint8_t size)
 
 bool set_window(uint8_t first_column, uint8_t last_column, uint8_t first_page, uint8_t last_page)
 {
+    // clang-format off
     const uint8_t commands[] = {
-        0x21u, first_column, last_column,
-        0x22u, first_page, last_page,
+        0x21u, first_column, last_column,  // column address range
+        0x22u, first_page,   last_page,    // page address range
     };
+    // clang-format on
 
     return send_commands(commands, static_cast<uint8_t>(sizeof(commands)));
 }
@@ -165,22 +167,24 @@ bool init()
 {
     // Sequence follows the Explorer assembly bring-up: 128x64 panel, remapped
     // columns, COM scan down, horizontal addressing, charge pump on.
+    // clang-format off
     const uint8_t init_commands[] = {
-        0xAEu,       // display off
+        0xAEu,         // display off
         0xD5u, 0x80u,  // display clock divide
         0xA8u, 0x3Fu,  // multiplex ratio for 64 rows
         0xD3u, 0x00u,  // display offset
-        0x40u,       // display start line
-        0xA1u,       // segment remap
-        0xC8u,       // COM scan direction remap
+        0x40u,         // display start line
+        0xA1u,         // segment remap
+        0xC8u,         // COM scan direction remap
         0xDAu, 0x12u,  // COM pins for 128x64
         0x81u, 0x7Fu,  // contrast
-        0xA4u,       // resume display from RAM
-        0xA6u,       // normal display
+        0xA4u,         // resume display from RAM
+        0xA6u,         // normal display
         0x20u, 0x00u,  // horizontal addressing mode
         0x8Du, 0x14u,  // charge pump enable
-        0xAFu,       // display on
+        0xAFu,         // display on
     };
+    // clang-format on
 
     return send_commands(init_commands, static_cast<uint8_t>(sizeof(init_commands))) && clear();
 }
@@ -215,7 +219,7 @@ bool write_text_page(uint8_t page, const char* text)
     }
 
     return set_window(0u, static_cast<uint8_t>(width - 1u), page, page)
-        && send_control(control_data, row, width);
+           && send_control(control_data, row, width);
 }
 
 }  // namespace oled

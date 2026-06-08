@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host-tests:
+    name: Host unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure (host, tests)
+        run: cmake -S . -B build-tests -DATTINY3217_EXPLORER_BUILD_TESTS=ON
+      - name: Build tests
+        run: cmake --build build-tests -j
+      - name: Run tests
+        run: ctest --test-dir build-tests --output-on-failure
+
+  lint:
+    name: Static analysis & format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cppcheck
+          pip install --user "clang-format==22.1.5"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      - name: clang-format check
+        run: |
+          files=$(find include src tests examples -name '*.hpp' -o -name '*.cpp')
+          clang-format --dry-run --Werror $files
+      - name: cppcheck
+        run: |
+          cppcheck --std=c++20 --enable=warning,style,performance,portability \
+            --error-exitcode=1 --inline-suppr \
+            --suppressions-list=.cppcheck-suppressions \
+            -Iinclude src include
+
+  firmware:
+    name: Firmware build (avr-gcc)
+    runs-on: ubuntu-latest
+    env:
+      AVR_GCC_URL: https://github.com/ZakKemble/avr-gcc-build/releases/download/v15.2.0-1/avr-gcc-15.2.0-x64-linux.tar.bz2
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install avr-gcc toolchain
+        run: |
+          mkdir -p "$HOME/avr-gcc"
+          curl -fsSL "$AVR_GCC_URL" | tar -xj -C "$HOME/avr-gcc" --strip-components=1
+          echo "$HOME/avr-gcc/bin" >> "$GITHUB_PATH"
+      - name: Toolchain versions
+        run: avr-g++ --version
+      - name: Configure (firmware + examples)
+        run: cmake --preset avr-examples
+      - name: Build library and example
+        run: cmake --build build -j
+      - name: Install package
+        run: cmake --install build --prefix "$RUNNER_TEMP/install"
+      - name: Strict-warnings build
+        run: |
+          cmake -S . -B build-strict --toolchain cmake/avr-gcc-toolchain.cmake \
+            -DATTINY3217_EXPLORER_BUILD_EXAMPLES=ON \
+            -DATTINY3217_EXPLORER_STRICT_WARNINGS=ON
+          cmake --build build-strict -j

@@ -35,7 +35,7 @@ static inline void init_internal_1v1(ADC_PRESC_t prescaler = ADC_PRESC_DIV16_gc)
 {
     // Select and enable the internal 1.1 V reference for ADC0.
     VREF.CTRLA = (VREF.CTRLA & static_cast<uint8_t>(~VREF_ADC0REFSEL_gm))
-               | reg8(VREF_ADC0REFSEL_1V1_gc);
+                 | reg8(VREF_ADC0REFSEL_1V1_gc);
     VREF.CTRLB |= VREF_ADC0REFEN_bm;
 
     // Reconfigure ADC0 to use the internal reference.

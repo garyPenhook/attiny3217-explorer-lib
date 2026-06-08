@@ -1,0 +1,7 @@
+# cppcheck suppressions for this project. See .github/workflows/ci.yml.
+missingIncludeSystem
+unmatchedSuppression
+# AVR device-header macros/registers are opaque to cppcheck without the DFP.
+unknownMacro
+# Public API surface is intentionally broader than the example exercises.
+unusedFunction

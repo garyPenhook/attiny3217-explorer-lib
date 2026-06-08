@@ -1,6 +1,6 @@
 # ATtiny3217 Explorer Library
 
-Reusable C++23 board support for the ATtiny3217 Curiosity Nano on the Curiosity Nano Explorer board.
+Reusable C++20 board support for the ATtiny3217 Curiosity Nano on the Curiosity Nano Explorer board.
 
 The library packages the board mappings and peripheral helpers from the working `avr_C++` project so later firmware can start from the same known-good pinout, clock, UART, SPI, TWI, ADC, SSD1306 OLED, and fuse policy.
 
@@ -21,7 +21,7 @@ Start with `docs/api-reference.md` for the complete public header API, then use 
 - MCU: `ATtiny3217`
 - Board: ATtiny3217 Curiosity Nano mounted on Curiosity Nano Explorer
 - CPU clock: internal 20 MHz oscillator, no prescaler
-- Build mode: `avr-g++`, `-std=gnu++23`, exceptions and RTTI disabled
+- Build mode: `avr-g++`, `-std=gnu++20`, exceptions and RTTI disabled
 - DFP headers: supplied by the toolchain, by `ATTINY3217_EXPLORER_DFP_INCLUDE`, or by the environment variable of the same name
 
 ## Quick Build

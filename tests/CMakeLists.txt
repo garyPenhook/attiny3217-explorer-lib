@@ -5,7 +5,7 @@ add_library(attiny3217_explorer_test_headers INTERFACE)
 target_include_directories(attiny3217_explorer_test_headers INTERFACE
     ${CMAKE_CURRENT_LIST_DIR}/../include
     ${CMAKE_CURRENT_LIST_DIR})
-target_compile_features(attiny3217_explorer_test_headers INTERFACE cxx_std_23)
+target_compile_features(attiny3217_explorer_test_headers INTERFACE cxx_std_20)
 target_compile_options(attiny3217_explorer_test_headers INTERFACE -Wall -Wextra)
 
 set(_explorer_tests

@@ -1,0 +1,25 @@
+---
+Language: Cpp
+BasedOnStyle: WebKit
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 0
+PointerAlignment: Left
+NamespaceIndentation: None
+BreakBeforeBraces: WebKit
+Cpp11BracedListStyle: true
+AlignOperands: Align
+BreakBeforeBinaryOperators: NonAssignment
+AlignTrailingComments:
+  Kind: Always
+  OverEmptyLines: 0
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+IndentCaseLabels: true
+SortIncludes: Never
+SpaceAfterTemplateKeyword: false
+SpacesBeforeTrailingComments: 2
+FixNamespaceComments: true

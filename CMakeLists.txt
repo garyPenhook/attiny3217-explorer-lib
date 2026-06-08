@@ -136,7 +136,7 @@ endfunction()
 add_library(attiny3217_explorer_hal INTERFACE)
 add_library(attiny3217_explorer::hal ALIAS attiny3217_explorer_hal)
 
-target_compile_features(attiny3217_explorer_hal INTERFACE cxx_std_23)
+target_compile_features(attiny3217_explorer_hal INTERFACE cxx_std_20)
 set_target_properties(attiny3217_explorer_hal PROPERTIES
     INTERFACE_CXX_EXTENSIONS ON
     EXPORT_NAME hal)

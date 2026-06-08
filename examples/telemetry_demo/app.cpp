@@ -110,7 +110,7 @@ inline void write_hex8(uint8_t value)
     const bool twi_ok = twi0::start_write(twi_target_address) == twi0::Status::ok;
     twi0::stop();
 
-    return Telemetry{
+    return Telemetry {
         .sample = sample,
         .sample_mv = sample_mv,
         .echo = echo,
@@ -173,16 +173,16 @@ inline void write_hex8(uint8_t value)
 namespace app {
 
 [[noreturn]] void run()
-    {
-        for (;;) {
-            // Each iteration samples peripherals, services input events, prints one
-            // status frame, then waits for the periodic TCA0 tick.
-            const Telemetry telemetry = sample_and_transfer();
-            service_events();
-            write_status_display(telemetry);
-            send_status_frame(telemetry);
-            timer0::wait_tick();
-        }
+{
+    for (;;) {
+        // Each iteration samples peripherals, services input events, prints one
+        // status frame, then waits for the periodic TCA0 tick.
+        const Telemetry telemetry = sample_and_transfer();
+        service_events();
+        write_status_display(telemetry);
+        send_status_frame(telemetry);
+        timer0::wait_tick();
     }
+}
 
 }  // namespace app

@@ -28,7 +28,7 @@ bool take_latched_press()
 
     return was_pressed;
 }
-}  // namespace 
+}  // namespace
 
 namespace button_irq {
 

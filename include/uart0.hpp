@@ -48,11 +48,11 @@ static inline void init(PinRoute route = PinRoute::Default)
     // Set baud, 8N1 asynchronous frame format, and enable transmitter/receiver.
     USART0.BAUD = Config<CpuHz, Baud>::baud_reg;
     USART0.CTRLC = reg8(USART_CMODE_ASYNCHRONOUS_gc)
-                 | reg8(USART_PMODE_DISABLED_gc)
-                 | reg8(USART_CHSIZE_8BIT_gc);
+                   | reg8(USART_PMODE_DISABLED_gc)
+                   | reg8(USART_CHSIZE_8BIT_gc);
     USART0.CTRLB = reg8(USART_RXMODE_NORMAL_gc)
-                 | reg8(USART_TXEN_bm)
-                 | reg8(USART_RXEN_bm);
+                   | reg8(USART_TXEN_bm)
+                   | reg8(USART_RXEN_bm);
 }
 
 static inline void write_byte(uint8_t value)

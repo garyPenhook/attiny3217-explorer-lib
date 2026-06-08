@@ -41,9 +41,9 @@ static inline void init_master(
     // Enable SPI0 as master and select clock rate. SPI_CLK2X halves the
     // effective prescaler when double_speed is true.
     SPI0.CTRLA = reg8(SPI_ENABLE_bm)
-               | reg8(SPI_MASTER_bm)
-               | reg8(prescaler)
-               | (double_speed ? reg8(SPI_CLK2X_bm) : 0u);
+                 | reg8(SPI_MASTER_bm)
+                 | reg8(prescaler)
+                 | (double_speed ? reg8(SPI_CLK2X_bm) : 0u);
 
     // Mode selects clock polarity/phase. SSD keeps master mode stable if SS is
     // configured as an input elsewhere.
