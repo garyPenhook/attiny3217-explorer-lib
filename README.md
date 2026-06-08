@@ -14,7 +14,11 @@ The library packages the board mappings and peripheral helpers from the working 
 | `docs/` | Board map, peripheral notes, and integration guide. |
 | `scripts/` | Artifact and memory-report helper scripts copied from the source project. |
 
-Start with `docs/api-reference.md` for the complete public header API, then use `docs/integration.md` for CMake wiring and `docs/peripherals.md` for hardware behavior notes.
+Start with `docs/api-reference.md` for the complete public header API, then use `docs/integration.md` for CMake wiring and `docs/peripherals.md` for hardware behavior notes. See [`docs/contracts.md`](docs/contracts.md) for project scope and per-module clock/pin/blocking/ISR/error contracts, [`CHANGELOG.md`](CHANGELOG.md) for version history, and [`CONTRIBUTING.md`](CONTRIBUTING.md) for the build/test/lint workflow.
+
+## Scope
+
+This is a board support library for the **ATtiny3217** on the **Curiosity Nano Explorer**, not a general AVR HAL. The `hal` headers are generic ATtiny3217 helpers; `board`/`drivers` encode the Explorer wiring and devices; the ISR components and `platform_init` are opt-in. Pre-1.0.0, minor releases may include breaking changes (see the changelog). Full details in [`docs/contracts.md`](docs/contracts.md).
 
 ## Assumptions
 
